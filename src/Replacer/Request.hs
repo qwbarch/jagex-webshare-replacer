@@ -1,5 +1,6 @@
 module Replacer.Request where
 
+import Control.Monad.IO.Class
 import Data.String.Interpolate
 import Data.ByteString
 import Network.HTTP.Req
@@ -37,7 +38,7 @@ requestWithProxy proxy body scheme response method url = do
             pure request
               {  HTTP.requestHeaders = authHeader : HTTP.requestHeaders request }
         }
-  manager <- HTTP.newManager managerSettings
+  manager <- liftIO $ HTTP.newManager managerSettings
   let config =
         defaultHttpConfig
           { httpConfigProxy = Just $ HTTP.Proxy proxy.host proxy.port

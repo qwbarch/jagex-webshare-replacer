@@ -4,6 +4,7 @@ import Replacer.Env
 import Replacer.Console
 import Replacer.Config
 import Replacer.API.Webshare
+import Replacer.API.Ipify
 import Control.Monad 
 import Control.Monad.Reader
 import Control.Monad.IO.Class
@@ -20,4 +21,9 @@ main = do
   flip runReaderT (Env config) $
     for config.planIds $ \(planId :: Int) -> do
       proxies <- getProxies planId
-      liftIO $ print proxies
+      --liftIO $ print proxies
+
+      for (take 5 proxies) $ \proxy -> do
+        address <- getIpAddress proxy
+        liftIO $ print address
+        pure ()

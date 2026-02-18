@@ -12,6 +12,7 @@ build-type:     Simple
 
 library
   exposed-modules:
+      Replacer.API.Ipify
       Replacer.API.Jagex
       Replacer.API.Webshare
       Replacer.Config

@@ -5,6 +5,7 @@ import Data.Text
 import Data.String.Interpolate
 import Data.Aeson
 import Data.Aeson.TH
+import Data.Maybe
 import Network.HTTP.Req
 import Replacer.Env
 import Replacer.Config
@@ -47,7 +48,8 @@ getProxies planId = do
           /: "-"
       query = "plan_id" =: (planId :: Int)
       parseProxies = do
-          fmap parseProxy
+          catMaybes
+            . fmap parseProxy
             . ByteString.split '\n'
             . ByteString.filter (/= '\r')
   parseProxies . responseBody <$> requestWebshare NoReqBody query bsResponse GET url

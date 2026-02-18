@@ -13,12 +13,14 @@ dependencies:
 - http-types
 - aeson
 - aeson-pretty
+- aeson-qq
 - mtl
 - transformers
 - pretty-terminal
 - terminal-progress-bar
 - directory
 - extra
+- unliftio
 
 ghc-options:
   -Wall

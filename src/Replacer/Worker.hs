@@ -2,7 +2,6 @@ module Replacer.Worker where
 
 import qualified Data.Vector as Vector
 import Control.Monad.Reader
-import Data.Maybe
 import UnliftIO
 import Replacer.Env
 import Replacer.Config

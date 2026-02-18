@@ -1,13 +1,11 @@
-module Replacer.Console (printText, color, Color(..), i) where
+module Replacer.Console (info, color, Color (..)) where
 
-import qualified System.Console.Pretty as Pretty
-import qualified Data.Text.IO as Text
 import Control.Monad.IO.Class
-import Data.Text
-import Data.String.Interpolate
-import System.Console.Pretty (Color(..))
-
-printText :: MonadIO m => Text -> m ()
-printText = liftIO . Text.putStrLn
+import Data.Text (Text)
+import qualified Data.Text.IO as Text
+import System.Console.Pretty (Color (..))
+import qualified System.Console.Pretty as Pretty
 
 color = Pretty.color @Text
+
+info text = liftIO $ Text.putStrLn text

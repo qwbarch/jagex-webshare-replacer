@@ -22,12 +22,14 @@ dependencies:
 - extra
 - unliftio
 - vector
+- regex-tdfa
 
 ghc-options:
   -Wall
   -Wno-name-shadowing
   -Wno-missing-signatures
   -Wno-type-defaults
+  -Wunused-imports
 
 default-extensions:
   - DataKinds

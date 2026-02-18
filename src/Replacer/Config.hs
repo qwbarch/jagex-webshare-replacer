@@ -1,9 +1,7 @@
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Replacer.Config where
 
 import qualified Data.ByteString.Lazy as ByteString
+import qualified Data.Vector as Vector
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Extra
@@ -13,6 +11,7 @@ import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.Aeson.QQ.Simple
 import Data.Text (Text)
 import Data.Typeable
+import Data.Vector
 import System.Directory
 import UnliftIO.Exception
 
@@ -20,7 +19,7 @@ configPath = "config.json"
 
 data Config = Config
   { apiKey :: Text
-  , planIds :: [Int]
+  , planIds :: Vector Int
   , maxThreads :: Int
   , replaceWith :: Value
   }
@@ -29,7 +28,7 @@ deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''Config
 
 defaultConfig = Config
   { apiKey = "YOUR_API_KEY_HERE"
-  , planIds = []
+  , planIds = mempty
   , maxThreads = 30
   , replaceWith = [aesonQQ|[{"type": "country", "country_code": "US"}]|]
   }
@@ -53,7 +52,7 @@ loadConfig = liftIO $ do
   when (config.apiKey == defaultConfig.apiKey) $
     throwIO $ ConfigError "Webshare API key is missing."
 
-  when (null config.planIds) $
+  when (Vector.null config.planIds) $
     throwIO $ ConfigError "Webshare plan ids cannot be empty."
 
   pure config

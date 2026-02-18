@@ -52,7 +52,7 @@ library
       TemplateHaskell
       TypeApplications
       TypeOperators
-  ghc-options: -Wall -Wno-name-shadowing -Wno-missing-signatures -Wno-type-defaults
+  ghc-options: -Wall -Wno-name-shadowing -Wno-missing-signatures -Wno-type-defaults -Wunused-imports
   build-depends:
       aeson
     , aeson-pretty
@@ -67,6 +67,7 @@ library
     , http-types
     , mtl
     , pretty-terminal
+    , regex-tdfa
     , req
     , string-interpolate
     , terminal-progress-bar
@@ -107,7 +108,7 @@ executable webshare-replacer-exe
       TemplateHaskell
       TypeApplications
       TypeOperators
-  ghc-options: -Wall -Wno-name-shadowing -Wno-missing-signatures -Wno-type-defaults -threaded -rtsopts -with-rtsopts=-N -O2 -flate-specialise -fspecialise-aggressively
+  ghc-options: -Wall -Wno-name-shadowing -Wno-missing-signatures -Wno-type-defaults -Wunused-imports -threaded -rtsopts -with-rtsopts=-N -O2 -flate-specialise -fspecialise-aggressively
   build-depends:
       aeson
     , aeson-pretty
@@ -122,6 +123,7 @@ executable webshare-replacer-exe
     , http-types
     , mtl
     , pretty-terminal
+    , regex-tdfa
     , req
     , string-interpolate
     , terminal-progress-bar

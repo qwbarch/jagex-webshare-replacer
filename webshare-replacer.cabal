@@ -1,0 +1,123 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.38.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           webshare-replacer
+version:        0.1.0.0
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+
+library
+  exposed-modules:
+      Replacer.API.Jagex
+      Replacer.API.Webshare
+      Replacer.Config
+      Replacer.Console
+      Replacer.Env
+      Replacer.Progress
+      Replacer.Request
+  other-modules:
+      Paths_webshare_replacer
+  hs-source-dirs:
+      src
+  default-extensions:
+      DataKinds
+      DeriveAnyClass
+      DeriveGeneric
+      DerivingStrategies
+      DuplicateRecordFields
+      EmptyDataDecls
+      ExplicitNamespaces
+      FlexibleContexts
+      GeneralizedNewtypeDeriving
+      LambdaCase
+      MultiParamTypeClasses
+      NegativeLiterals
+      NumericUnderscores
+      OverloadedLabels
+      OverloadedStrings
+      OverloadedRecordDot
+      PolyKinds
+      QuasiQuotes
+      RankNTypes
+      ScopedTypeVariables
+      StrictData
+      TemplateHaskell
+      TypeApplications
+      TypeOperators
+  ghc-options: -Wall -Wno-name-shadowing -Wno-missing-signatures -Wno-type-defaults
+  build-depends:
+      aeson
+    , aeson-pretty
+    , base >=4.7 && <5
+    , base64-bytestring
+    , bytestring
+    , directory
+    , extra
+    , http-client
+    , http-client-tls
+    , http-types
+    , mtl
+    , pretty-terminal
+    , req
+    , string-interpolate
+    , terminal-progress-bar
+    , text
+    , transformers
+  default-language: Haskell2010
+
+executable webshare-replacer-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_webshare_replacer
+  hs-source-dirs:
+      app
+  default-extensions:
+      DataKinds
+      DeriveAnyClass
+      DeriveGeneric
+      DerivingStrategies
+      DuplicateRecordFields
+      EmptyDataDecls
+      ExplicitNamespaces
+      FlexibleContexts
+      GeneralizedNewtypeDeriving
+      LambdaCase
+      MultiParamTypeClasses
+      NegativeLiterals
+      NumericUnderscores
+      OverloadedLabels
+      OverloadedStrings
+      OverloadedRecordDot
+      PolyKinds
+      QuasiQuotes
+      RankNTypes
+      ScopedTypeVariables
+      StrictData
+      TemplateHaskell
+      TypeApplications
+      TypeOperators
+  ghc-options: -Wall -Wno-name-shadowing -Wno-missing-signatures -Wno-type-defaults -threaded -rtsopts -with-rtsopts=-N -O2 -flate-specialise -fspecialise-aggressively
+  build-depends:
+      aeson
+    , aeson-pretty
+    , base >=4.7 && <5
+    , base64-bytestring
+    , bytestring
+    , directory
+    , extra
+    , http-client
+    , http-client-tls
+    , http-types
+    , mtl
+    , pretty-terminal
+    , req
+    , string-interpolate
+    , terminal-progress-bar
+    , text
+    , transformers
+    , webshare-replacer
+  default-language: Haskell2010

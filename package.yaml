@@ -1,0 +1,70 @@
+name:                webshare-replacer
+version:             0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- text
+- bytestring
+- base64-bytestring
+- string-interpolate
+- req
+- http-client
+- http-client-tls
+- http-types
+- aeson
+- aeson-pretty
+- mtl
+- transformers
+- pretty-terminal
+- terminal-progress-bar
+- directory
+- extra
+
+ghc-options:
+  -Wall
+  -Wno-name-shadowing
+  -Wno-missing-signatures
+  -Wno-type-defaults
+
+default-extensions:
+  - DataKinds
+  - DeriveAnyClass
+  - DeriveGeneric
+  - DerivingStrategies
+  - DuplicateRecordFields
+  - EmptyDataDecls
+  - ExplicitNamespaces
+  - FlexibleContexts
+  - GeneralizedNewtypeDeriving
+  - LambdaCase
+  - MultiParamTypeClasses
+  - NegativeLiterals
+  - NumericUnderscores
+  - OverloadedLabels
+  - OverloadedStrings
+  - OverloadedRecordDot
+  - PolyKinds
+  - QuasiQuotes
+  - RankNTypes
+  - ScopedTypeVariables
+  - StrictData
+  - TemplateHaskell
+  - TypeApplications
+  - TypeOperators
+
+library:
+  source-dirs: src
+
+executables:
+  webshare-replacer-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -O2
+    - -flate-specialise
+    - -fspecialise-aggressively
+    dependencies:
+    - webshare-replacer

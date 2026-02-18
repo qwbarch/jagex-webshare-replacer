@@ -1,17 +1,23 @@
 module Main where
 
-import Replacer.Console
 import Replacer.Env
-import Control.Monad 
-import Control.Concurrent 
-import System.ProgressBar 
-import Data.Foldable 
-import System.ProgressBar (Style(stylePostfix))
+import Replacer.Console
 import Replacer.Config
+import Replacer.API.Webshare
+import Control.Monad 
+import Control.Monad.Reader
+import Control.Monad.IO.Class
+import Control.Concurrent 
+import Data.Foldable 
+import Data.Traversable
+import System.ProgressBar 
 
 main = do
   _ <- printText [i|hello world! my name is #{color Yellow "bob"}|]
 
   config <- loadConfig
-  
-  pure ()
+
+  flip runReaderT (Env config) $
+    for config.planIds $ \(planId :: Int) -> do
+      proxies <- getProxies planId
+      liftIO $ print proxies

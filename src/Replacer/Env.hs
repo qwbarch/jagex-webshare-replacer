@@ -1,7 +1,7 @@
 module Replacer.Env where
 
-import Data.ByteString
+import Replacer.Config
 
 newtype Env = Env
-  { apiKey :: ByteString
+  { config :: Config
   }

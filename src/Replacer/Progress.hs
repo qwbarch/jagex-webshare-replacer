@@ -24,3 +24,5 @@ createProgressBar label max =
               , msg "s"
               ]
           }
+
+updateProgressBar = flip incProgress 1

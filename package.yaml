@@ -21,6 +21,7 @@ dependencies:
 - directory
 - extra
 - unliftio
+- vector
 
 ghc-options:
   -Wall

@@ -1,5 +1,6 @@
 module Main where
 
+import Replacer
 import Replacer.Env
 import Replacer.Console
 import Replacer.Config
@@ -19,11 +20,4 @@ main = do
   config <- loadConfig
 
   flip runReaderT (Env config) $
-    for config.planIds $ \(planId :: Int) -> do
-      proxies <- getProxies planId
-      --liftIO $ print proxies
-
-      for (take 5 proxies) $ \proxy -> do
-        address <- getIpAddress proxy
-        liftIO $ print address
-        pure ()
+    replaceBlockedProxies

@@ -19,6 +19,7 @@ library
       Replacer.Console
       Replacer.Env
       Replacer.Progress
+      Replacer.Proxy
       Replacer.Request
   other-modules:
       Paths_webshare_replacer

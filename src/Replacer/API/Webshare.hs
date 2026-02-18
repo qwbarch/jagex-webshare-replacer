@@ -1,5 +1,6 @@
 module Replacer.API.Webshare where
 
+import qualified Data.ByteString.Char8 as ByteString
 import Control.Monad.Reader
 import Data.Text
 import Data.String.Interpolate
@@ -10,7 +11,7 @@ import Network.HTTP.Req
 import Replacer.Env
 import Replacer.Config
 import Replacer.Request
-import qualified Data.ByteString.Char8 as ByteString
+import Replacer.Proxy
 
 base = https "proxy.webshare.io" /: "api"
 
@@ -26,8 +27,7 @@ requestWebshare body scheme response method url = do
   request body (scheme <> tokenHeader) response method url
 
 getDownloadToken planId =
-  proxyListDownloadToken . responseBody
-    <$> requestWebshare NoReqBody query jsonResponse GET url
+  proxyListDownloadToken <$> requestWebshare NoReqBody query jsonResponse GET url
   where
     url = base /: "v3" /: "proxy" /: "config"
     query = "plan_id" =: (planId :: Int)
@@ -52,4 +52,4 @@ getProxies planId = do
             . fmap parseProxy
             . ByteString.split '\n'
             . ByteString.filter (/= '\r')
-  parseProxies . responseBody <$> requestWebshare NoReqBody query bsResponse GET url
+  parseProxies <$> requestWebshare NoReqBody query bsResponse GET url

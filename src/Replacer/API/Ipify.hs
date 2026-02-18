@@ -5,11 +5,7 @@ import Data.Text
 import Data.Aeson.TH
 import Network.HTTP.Req
 import Control.Monad.IO.Class
-
-newtype IpAddress = IpAddress Text
-  deriving newtype Show
-
-deriveJSON defaultOptions ''IpAddress
+import Replacer.Proxy
 
 newtype IpAddressResponse = IpAddressResponse
   { ip :: IpAddress

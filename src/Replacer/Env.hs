@@ -1,7 +1,9 @@
 module Replacer.Env where
 
 import Replacer.Config
+import Control.Retry
 
-newtype Env = Env
+data Env = Env
   { config :: Config
+  , retryPolicy :: RetryPolicyM IO
   }

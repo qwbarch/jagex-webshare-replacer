@@ -1,7 +1,6 @@
 module Replacer.API.Webshare where
 
 import qualified Data.ByteString.Char8 as ByteString
-import qualified Data.Vector as Vector
 import Control.Monad.Reader
 import Data.Text
 import Data.String.Interpolate
@@ -13,6 +12,9 @@ import Replacer.Env
 import Replacer.Config
 import Replacer.Request
 import Replacer.Proxy
+import Data.Text.Encoding
+import qualified Data.Text as Text
+import qualified Data.Vector as Vector
 
 base = https "proxy.webshare.io" /: "api"
 
@@ -22,7 +24,7 @@ newtype DownloadTokenResponse = DownloadTokenResponse
 
 deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''DownloadTokenResponse
 
-newtype ReplacementId = ReplacementId Text
+newtype ReplacementId = ReplacementId Int
   deriving newtype Show
 
 deriveJSON defaultOptions ''ReplacementId
@@ -35,10 +37,10 @@ deriveJSON defaultOptions ''CreateReplacementResponse
 
 data GetReplacementResponse = GetReplacementResponse
   { state :: Text
-  , proxiesAdded :: Int
+  , proxiesAdded :: Maybe Int
   , error :: Maybe Text
   , errorCode :: Maybe Text
-  }
+  } deriving Show
 
 deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''GetReplacementResponse
 
@@ -65,7 +67,7 @@ getProxies planId = do
           /: "-"
           /: "any"
           /: "username"
-          /: "backbone"
+          /: "direct"
           /: "-"
       query = "plan_id" =: (planId :: Int)
       parseProxies = do
@@ -76,7 +78,7 @@ getProxies planId = do
             . ByteString.filter (/= '\r')
   parseProxies <$> requestWebshare NoReqBody query bsResponse GET url
 
-createReplacement planId addresses = do
+createReplacement planId proxies = do
   env <- ask
   let url = base /: "v3" /: "proxy" /: "replace"
       query = "plan_id" =: (planId :: Int)
@@ -84,15 +86,17 @@ createReplacement planId addresses = do
         object
           [ "to_replace" .= object
               [ "type" .= ("ip_address" :: String)
-              , "ip_addresses" .= addresses
+              , "ip_addresses" .= (Vector.map (decodeUtf8 . host) proxies)
               ]
           , "replace_with" .= env.config.replaceWith
           , "dry_run" .= False
           ]
-  response :: CreateReplacementResponse <- requestWebshare (ReqBodyJson requestBody) query jsonResponse POST url
+  response :: CreateReplacementResponse <-
+    requestWebshare (ReqBodyJson requestBody) query jsonResponse POST url
   pure $ response.id
 
-getReplacement planId replacementId = do
-  let url = base /: "v3" /: "proxy" /: "replace" /: replacementId
-      query = "plan_id" =: (planId :: Int)
-  requestWebshare NoReqBody query (jsonResponse @GetReplacementResponse) POST url
+getReplacement planId replacementId =
+  requestWebshare NoReqBody query (jsonResponse @GetReplacementResponse) GET url
+  where
+    url = base /: "v3" /: "proxy" /: "replace" /: Text.show replacementId
+    query = "plan_id" =: (planId :: Int)

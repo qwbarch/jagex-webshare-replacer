@@ -3,11 +3,22 @@ module Replacer.API.Jagex where
 import qualified Data.ByteString as ByteString
 import Network.HTTP.Req
 import Replacer.Request
+import Network.HTTP.Types (Status(..))
+import Network.HTTP.Client (Response(..), responseStatus, HttpExceptionContent (StatusCodeException))
 
 isJagexBlocked proxy =
   ByteString.isInfixOf "Sorry, you have been blocked"
-    <$> requestWithProxy proxy NoReqBody headers bsResponse GET url
+    <$> requestWithProxy' modifyConfig proxy NoReqBody headers bsResponse GET url
   where
+    modifyConfig config =
+        config 
+          { httpConfigCheckResponse = \_ response _ ->
+              let code = statusCode $ responseStatus response
+              in -- Don't throw on error 403 since that's the status code for when we get blocked.
+                if code /= 403 && code >= 400
+                  then Just $ StatusCodeException (response { responseBody = () }) mempty
+                  else Nothing
+          }
     url = https "account.jagex.com"
     headers =
       mconcat

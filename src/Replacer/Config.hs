@@ -22,6 +22,7 @@ data Config = Config
   , planIds :: Vector Int
   , maxThreads :: Int
   , replaceWith :: Value
+  , waitSecondsAfterReplacement :: Int
   }
 
 deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''Config
@@ -29,8 +30,9 @@ deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''Config
 defaultConfig = Config
   { apiKey = "YOUR_API_KEY_HERE"
   , planIds = mempty
-  , maxThreads = 30
+  , maxThreads = 1000
   , replaceWith = [aesonQQ|[{"type": "country", "country_code": "US"}]|]
+  , waitSecondsAfterReplacement = 15
   }
 
 data ConfigError = ConfigError String

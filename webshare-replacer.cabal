@@ -13,7 +13,6 @@ build-type:     Simple
 library
   exposed-modules:
       Replacer
-      Replacer.API.Ipify
       Replacer.API.Jagex
       Replacer.API.Webshare
       Replacer.Config
@@ -62,6 +61,7 @@ library
     , bytestring
     , directory
     , extra
+    , hashable
     , http-client
     , http-client-tls
     , http-types
@@ -69,11 +69,13 @@ library
     , pretty-terminal
     , regex-tdfa
     , req
+    , retry
     , string-interpolate
     , terminal-progress-bar
     , text
     , transformers
     , unliftio
+    , unordered-containers
     , vector
   default-language: Haskell2010
 
@@ -118,6 +120,7 @@ executable webshare-replacer-exe
     , bytestring
     , directory
     , extra
+    , hashable
     , http-client
     , http-client-tls
     , http-types
@@ -125,11 +128,13 @@ executable webshare-replacer-exe
     , pretty-terminal
     , regex-tdfa
     , req
+    , retry
     , string-interpolate
     , terminal-progress-bar
     , text
     , transformers
     , unliftio
+    , unordered-containers
     , vector
     , webshare-replacer
   default-language: Haskell2010

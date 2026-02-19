@@ -23,6 +23,9 @@ dependencies:
 - unliftio
 - vector
 - regex-tdfa
+- retry
+- hashable
+- unordered-containers
 
 ghc-options:
   -Wall

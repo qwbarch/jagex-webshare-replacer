@@ -1,9 +1,9 @@
 module Replacer.Proxy where
 
-import Data.Aeson.TH
-import Data.Text
 import Data.String.Interpolate
 import Data.ByteString
+import Data.Hashable
+import GHC.Generics
 import qualified Data.ByteString.Char8 as ByteString
 
 data Proxy = Proxy
@@ -11,7 +11,7 @@ data Proxy = Proxy
   , port :: Int
   , user :: ByteString
   , password :: ByteString
-  } deriving Show
+  } deriving (Show, Eq, Ord, Generic, Hashable)
 
 -- | Parse a proxy string of the format:
 -- | HOST:PORT:USER:PASS
@@ -27,13 +27,3 @@ parseProxy input =
 -- | HOST:PORT:USER:PASS
 formatProxy (Proxy host port user password) =
   [i|#{host}:#{port}:#{user}:#{password}|]
-
-newtype IpAddress = IpAddress Text
-  deriving newtype Show
-
-deriveJSON defaultOptions ''IpAddress
-
-data ProxyWithAddress = ProxyWithAddress
-    { proxy :: Proxy
-    , address :: IpAddress
-    }

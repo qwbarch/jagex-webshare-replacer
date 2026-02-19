@@ -9,3 +9,7 @@ and this project adheres to the
 ## 0.1.0.0 - 2026-02-19
 
 - Initial release.
+
+## 0.1.0.1 - 2026-02-19
+
+- Fixed active proxy count on repeated runs.

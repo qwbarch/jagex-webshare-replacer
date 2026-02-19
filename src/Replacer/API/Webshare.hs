@@ -44,6 +44,18 @@ data GetReplacementResponse = GetReplacementResponse
 
 deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''GetReplacementResponse
 
+data GetPlanDetailsResponse = GetPlanDetailsResponse
+  { id :: Int
+  , status :: Text
+  , proxyType :: Text
+  , proxyCount :: Int
+  , proxyReplacementsTotal :: Int
+  , proxyReplacementsUsed :: Int
+  , proxyReplacementsAvailable :: Int
+  }
+
+deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''GetPlanDetailsResponse
+
 requestWebshare body scheme response method url = do
   env <- ask
   let tokenHeader = header "Authorization" [i|Token #{apiKey $ config env}|]
@@ -100,3 +112,7 @@ getReplacement planId replacementId =
   where
     url = base /: "v3" /: "proxy" /: "replace" /: Text.show replacementId
     query = "plan_id" =: (planId :: Int)
+
+getPlanDetails planId = requestWebshare NoReqBody mempty (jsonResponse @GetPlanDetailsResponse) GET url
+  where
+    url = base /: "v2" /: "subscription" /: "plan" /: Text.show planId

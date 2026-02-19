@@ -70,9 +70,13 @@ replaceBlockedWebshareProxies =
           blockedCount = Vector.length blockedProxies
 
       info [i|Proxies active: #{highlight Green unblockedCount}|]
-      info [i|Proxies blocked: #{highlight Red blockedCount}\n|]
+      info [i|Proxies blocked: #{highlight Red blockedCount}|]
 
-      when (blockedCount > 0) $ do
+      planDetails <- getPlanDetails planId
+      let replacementsAvailable = proxyReplacementsAvailable planDetails
+      info [i|Plan #{planId} has #{highlight Yellow replacementsAvailable} replacements remaining.\n|]
+
+      when (blockedCount > 0 && replacementsAvailable > 0) $ do
         withProgressBar_ "Attempting to replace blocked proxies" $
           waitUntilReplacementFinished planId =<< createReplacement planId blockedProxies
         

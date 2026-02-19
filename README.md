@@ -29,3 +29,11 @@ A simple script that checks and replaces your webshare proxies if they are block
 To find your plan id, go to your ``proxy server`` or ``static residential`` page. The plan id is the 8-digit number shown in the picture below.
 
 <img width="1243" height="251" alt="plan_id" src="https://github.com/user-attachments/assets/2987ed92-3eba-427d-90b8-a59fb25fd445" />
+
+## Build binary
+
+If you would like to build the binary from scratch, you will need to install stack (preferably via [ghcup](https://www.haskell.org/ghcup/)).
+
+```
+stack build --copy-bins --local-bin-path ./bin
+```

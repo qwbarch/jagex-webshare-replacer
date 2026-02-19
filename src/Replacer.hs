@@ -1,6 +1,5 @@
 module Replacer where
 
-import qualified Data.Vector as Vector
 import qualified Data.HashSet as HashSet
 import Control.Monad.Extra
 import Control.Monad.IO.Class
@@ -20,6 +19,7 @@ import Replacer.API.Webshare
 import Replacer.Progress
 import UnliftIO
 import UnliftIO.Concurrent
+import qualified Data.Vector as Vector
 
 data ReplaceError = ReplaceError Text
   deriving (Show, Typeable)
@@ -32,19 +32,9 @@ replaceBlockedWebshareProxies =
     >>= traverse_ (replaceBlockedProxies mempty)
     >> info (color Green "Finished replacing all blocked proxies.")
   where
-    -- These conversions don't look great, but:
-    -- • HashSet does not have a traversable instance (needed for runWorkers)
-    -- • Vector does not have set functions such as difference, union, etc.
-    -- • No direct conversions between the two types.
-    toSet = HashSet.fromList . Vector.toList
-    vectorDifference a b =
-      Vector.fromList
-        . HashSet.toList
-        $ HashSet.difference (toSet a) (toSet b)
-
     fetchPlanIds = do
       planIds <- asks (.config.planIds)
-      let planCount = Vector.length planIds
+      let planCount = HashSet.size planIds
       info [i|Loaded #{planCount} proxy plan#{pluralPostfix planCount}: #{planIds}\n|]
       return planIds
 
@@ -53,21 +43,22 @@ replaceBlockedWebshareProxies =
 
       info [i|Fetching proxy list for plan #{highlight Yellow planId}|]
       proxies <- getProxies planId
-      let proxyCount = Vector.length proxies
+      let proxyCount = HashSet.size proxies
       info [i|Found #{highlight Cyan proxyCount} #{pluralProxy proxyCount} in plan #{highlight Yellow planId}|]
 
-      let uncheckedProxies = vectorDifference proxies checkedProxies
+      let uncheckedProxies = Vector.fromList . toList $ HashSet.difference proxies checkedProxies
           uncheckedCount = Vector.length uncheckedProxies
       
       info[i|Remaining #{highlight Cyan uncheckedCount} #{pluralProxy uncheckedCount} need to be checked.\n|]
 
+      let toHashSet = HashSet.fromList . Vector.toList . fmap fst
       (blockedProxies, unblockedProxies) <-
-        fmap (bimap (fmap fst) (fmap fst) . Vector.partition snd)
+        fmap (bimap toHashSet toHashSet . Vector.partition snd)
           . runWorkers isJagexBlocked uncheckedProxies
           $ Just [i|Checking #{pluralProxy proxyCount} for jagex block#{pluralPostfix proxyCount} |]
 
-      let unblockedCount = Vector.length unblockedProxies
-          blockedCount = Vector.length blockedProxies
+      let unblockedCount = HashSet.size unblockedProxies + HashSet.size checkedProxies
+          blockedCount = HashSet.size blockedProxies
 
       info [i|Proxies active: #{highlight Green unblockedCount}|]
       info [i|Proxies blocked: #{highlight Red blockedCount}|]
@@ -110,6 +101,6 @@ replaceBlockedWebshareProxies =
               throwIO $ ReplaceError [i|Failed to replace proxies: #{errorCode replacement}|]
             Nothing ->
               throwIO
-              . ReplaceError
-              $ [i|Something unexpected occurred.\nReplacement response: #{replacement}|]
+                . ReplaceError
+                $ [i|Something unexpected occurred.\nReplacement response: #{replacement}|]
         state -> throwIO $ ReplaceError [i|Unexpected state while fetching replacement: #{state}|]

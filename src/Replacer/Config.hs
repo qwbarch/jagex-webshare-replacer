@@ -1,9 +1,8 @@
 module Replacer.Config where
 
 import qualified Data.ByteString.Lazy as ByteString
-import qualified Data.Vector as Vector
+import qualified Data.HashSet as HashSet
 import Control.Monad
-import Control.Monad.IO.Class
 import Control.Monad.Extra
 import Data.Aeson
 import Data.Aeson.TH
@@ -11,7 +10,7 @@ import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.Aeson.QQ.Simple
 import Data.Text (Text)
 import Data.Typeable
-import Data.Vector
+import Data.HashSet
 import System.Directory
 import UnliftIO.Exception
 
@@ -19,7 +18,7 @@ configPath = "config.json"
 
 data Config = Config
   { apiKey :: Text
-  , planIds :: Vector Int
+  , planIds :: HashSet Int
   , maxThreads :: Int
   , replaceWith :: Value
   , waitSecondsAfterReplacement :: Int
@@ -41,8 +40,7 @@ data ConfigError = ConfigError String
 instance Exception ConfigError
 
 -- | Loads the json config and creates the file with default values if missing.
-loadConfig :: MonadIO m => m Config
-loadConfig = liftIO $ do
+loadConfig = do
   -- Warning: This is not atomic, but is good enough for our use-case.
   unlessM (doesFileExist configPath) $
     ByteString.writeFile configPath (encodePretty defaultConfig)
@@ -54,7 +52,7 @@ loadConfig = liftIO $ do
   when (config.apiKey == defaultConfig.apiKey) $
     throwIO $ ConfigError "Webshare API key is missing."
 
-  when (Vector.null config.planIds) $
+  when (HashSet.null config.planIds) $
     throwIO $ ConfigError "Webshare plan ids cannot be empty."
 
   pure config

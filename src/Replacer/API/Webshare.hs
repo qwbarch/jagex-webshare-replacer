@@ -2,7 +2,6 @@ module Replacer.API.Webshare where
 
 import qualified Data.ByteString.Char8 as ByteString
 import qualified Data.Text as Text
-import qualified Data.Vector as Vector
 import Control.Monad.Reader
 import Data.Text
 import Data.String.Interpolate
@@ -15,6 +14,7 @@ import Replacer.Env
 import Replacer.Config
 import Replacer.Request
 import Replacer.Proxy
+import qualified Data.HashSet as HashSet
 
 base = https "proxy.webshare.io" /: "api"
 
@@ -83,7 +83,7 @@ getProxies planId = do
           /: "-"
       query = "plan_id" =: (planId :: Int)
       parseProxies = do
-          Vector.fromList
+          HashSet.fromList
             . catMaybes
             . fmap parseProxy
             . ByteString.split '\n'
@@ -98,7 +98,7 @@ createReplacement planId proxies = do
         object
           [ "to_replace" .= object
               [ "type" .= ("ip_address" :: String)
-              , "ip_addresses" .= (Vector.map (decodeUtf8 . host) proxies)
+              , "ip_addresses" .= (HashSet.map (decodeUtf8 . host) proxies)
               ]
           , "replace_with" .= env.config.replaceWith
           , "dry_run" .= False

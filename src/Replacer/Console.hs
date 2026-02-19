@@ -7,12 +7,12 @@ module Replacer.Console (
   Color (..)
 ) where
 
-import Control.Monad.IO.Class
-import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.IO as IO
-import System.Console.Pretty (Color (..))
 import qualified System.Console.Pretty as Pretty
+import Control.Monad.IO.Class
+import Data.Text (Text)
+import System.Console.Pretty (Color (..))
 
 color = Pretty.color @Text
 

@@ -1,7 +1,6 @@
 module Replacer.Config where
 
 import qualified Data.ByteString.Lazy as ByteString
-import qualified Data.HashSet as HashSet
 import Control.Monad
 import Control.Monad.Extra
 import Data.Aeson
@@ -10,15 +9,16 @@ import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.Aeson.QQ.Simple
 import Data.Text (Text)
 import Data.Typeable
-import Data.HashSet
+import Data.Vector
 import System.Directory
 import UnliftIO.Exception
+import qualified Data.Vector as Vector
 
 configPath = "config.json"
 
 data Config = Config
   { apiKey :: Text
-  , planIds :: HashSet Int
+  , planIds :: Vector Int
   , maxThreads :: Int
   , replaceWith :: Value
   , waitSecondsAfterReplacement :: Int
@@ -52,7 +52,7 @@ loadConfig = do
   when (config.apiKey == defaultConfig.apiKey) $
     throwIO $ ConfigError "Webshare API key is missing."
 
-  when (HashSet.null config.planIds) $
+  when (Vector.null config.planIds) $
     throwIO $ ConfigError "Webshare plan ids cannot be empty."
 
   pure config

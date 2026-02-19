@@ -34,7 +34,7 @@ replaceBlockedWebshareProxies =
   where
     fetchPlanIds = do
       planIds <- asks (.config.planIds)
-      let planCount = HashSet.size planIds
+      let planCount = Vector.length planIds
       info [i|Loaded #{planCount} proxy plan#{pluralPostfix planCount}: #{planIds}\n|]
       return planIds
 

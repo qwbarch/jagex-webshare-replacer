@@ -14,7 +14,7 @@ main =
   handle @_ @SomeException (info . color Red . Text.pack . displayException) run
     >> callCommand "pause" -- Only works on Windows. Fine for now since I'm only building .exe anyways.
   where
+    retryPolicy = fullJitterBackoff 1 <> limitRetries 10
     run = do
-      let retryPolicy = fullJitterBackoff 1 <> limitRetries 10
       config <- loadConfig
       runReaderT replaceBlockedWebshareProxies (Env config retryPolicy)

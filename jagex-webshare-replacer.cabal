@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           webshare-replacer
+name:           jagex-webshare-replacer
 version:        0.1.0.0
 license:        MIT
 license-file:   LICENSE
@@ -23,7 +23,7 @@ library
       Replacer.Request
       Replacer.Worker
   other-modules:
-      Paths_webshare_replacer
+      Paths_jagex_webshare_replacer
   hs-source-dirs:
       src
   default-extensions:
@@ -79,10 +79,10 @@ library
     , vector
   default-language: Haskell2010
 
-executable webshare-replacer-exe
+executable jagex-webshare-replacer
   main-is: Main.hs
   other-modules:
-      Paths_webshare_replacer
+      Paths_jagex_webshare_replacer
   hs-source-dirs:
       app
   default-extensions:
@@ -124,6 +124,7 @@ executable webshare-replacer-exe
     , http-client
     , http-client-tls
     , http-types
+    , jagex-webshare-replacer
     , mtl
     , pretty-terminal
     , regex-tdfa
@@ -136,5 +137,4 @@ executable webshare-replacer-exe
     , unliftio
     , unordered-containers
     , vector
-    , webshare-replacer
   default-language: Haskell2010

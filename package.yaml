@@ -1,5 +1,5 @@
-name:                webshare-replacer
-version:             0.1.0.0
+name: jagex-webshare-replacer
+version: 0.1.0.0
 
 dependencies:
 - base >= 4.7 && < 5
@@ -64,9 +64,9 @@ library:
   source-dirs: src
 
 executables:
-  webshare-replacer-exe:
-    main:                Main.hs
-    source-dirs:         app
+  jagex-webshare-replacer:
+    main: Main.hs
+    source-dirs: app
     ghc-options:
     - -threaded
     - -rtsopts
@@ -75,4 +75,4 @@ executables:
     - -flate-specialise
     - -fspecialise-aggressively
     dependencies:
-    - webshare-replacer
+    - jagex-webshare-replacer

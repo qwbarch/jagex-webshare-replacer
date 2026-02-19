@@ -1,10 +1,10 @@
 module Replacer.Request where
 
-import Network.HTTP.Req
 import qualified Network.HTTP.Client as HTTP
 import qualified Data.ByteString.Base64 as Base64
 import Control.Monad.Reader
 import Replacer.Proxy 
+import Network.HTTP.Req
 import Network.HTTP.Client (Response(responseStatus))
 import Network.HTTP.Types (Status(statusCode))
 

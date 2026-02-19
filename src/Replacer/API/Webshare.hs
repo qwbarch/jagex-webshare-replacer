@@ -1,20 +1,20 @@
 module Replacer.API.Webshare where
 
 import qualified Data.ByteString.Char8 as ByteString
+import qualified Data.Text as Text
+import qualified Data.Vector as Vector
 import Control.Monad.Reader
 import Data.Text
 import Data.String.Interpolate
 import Data.Aeson
 import Data.Aeson.TH
 import Data.Maybe
+import Data.Text.Encoding
 import Network.HTTP.Req
 import Replacer.Env
 import Replacer.Config
 import Replacer.Request
 import Replacer.Proxy
-import Data.Text.Encoding
-import qualified Data.Text as Text
-import qualified Data.Vector as Vector
 
 base = https "proxy.webshare.io" /: "api"
 

@@ -1,25 +1,25 @@
 module Replacer where
 
 import qualified Data.Vector as Vector
+import qualified Data.HashSet as HashSet
+import Control.Monad.Extra
+import Control.Monad.IO.Class
+import Control.Monad.Reader
+import Data.Bifunctor
+import Data.Maybe
+import Data.Vector.Internal.Check
+import Data.Foldable.Extra
+import Data.Text
+import Data.String.Interpolate
 import Replacer.Console
 import Replacer.Config
 import Replacer.Worker
 import Replacer.Env
 import Replacer.API.Jagex
 import Replacer.API.Webshare
-import Control.Monad.IO.Class
-import Control.Monad.Reader
-import Data.String.Interpolate
-import UnliftIO
-import Data.Foldable.Extra
-import qualified Data.HashSet as HashSet
-import Data.Text (Text)
 import Replacer.Progress
+import UnliftIO
 import UnliftIO.Concurrent
-import Data.Vector.Internal.Check (HasCallStack)
-import Data.Bifunctor
-import Data.Maybe
-import Control.Monad.Extra
 
 data ReplaceError = ReplaceError Text
   deriving (Show, Typeable)

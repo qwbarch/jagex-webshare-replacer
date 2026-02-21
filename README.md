@@ -13,6 +13,12 @@ A simple script that checks and replaces your webshare proxies if they are block
 5. If replacing ``Static Residential`` proxies, find its [plan id](#finding-plan-ids) and paste it when prompted. Leave blank to skip this plan.
 6. Enter the [country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for your replacement proxies. Leave blank to default to ``US``.
 
+## Finding plan ids
+
+To find your plan id, go to your ``proxy server`` or ``static residential`` page. The plan id is the 8-digit number shown in the picture below.
+
+<img width="1243" height="251" alt="plan_id" src="https://github.com/user-attachments/assets/2987ed92-3eba-427d-90b8-a59fb25fd445" />
+
 ## Configuration
 
 > [!WARNING]
@@ -26,11 +32,6 @@ A simple script that checks and replaces your webshare proxies if they are block
 | wait_seconds_after_replacement | number   | 15      | Number of seconds to wait after an attempt to replace proxies before trying again.                                                       |
 | replace_with                   | object   |         | See [replacement definitions](https://apidocs.webshare.io/proxy-replacement/proxy_replacement#replacement-definitions) for more options. |
 
-## Finding plan ids
-
-To find your plan id, go to your ``proxy server`` or ``static residential`` page. The plan id is the 8-digit number shown in the picture below.
-
-<img width="1243" height="251" alt="plan_id" src="https://github.com/user-attachments/assets/2987ed92-3eba-427d-90b8-a59fb25fd445" />
 
 ## Build binary
 

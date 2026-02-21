@@ -79,10 +79,9 @@ loadConfig = runInputT @IO defaultSettings $ do
           updateConfig #staticPlanId =<< promptPlanId "Static residential plan id (leave empty to skip): "
           updateConfig #datacenterPlanId =<< promptPlanId "Proxy server plan id (leave empty to skip): "
           promptProxyPlan
-      defaultReplaceWith :: String -> Maybe Value
-      defaultReplaceWith countryCode =
+      defaultReplaceWith (countryCode :: String) =
         Just $
-          toJSON
+          toJSON @[Value]
             [ object
                 [ "type" .= ("country" :: Text)
                 , "country_code" .= (if null countryCode then "US" else countryCode)
@@ -93,9 +92,10 @@ loadConfig = runInputT @IO defaultSettings $ do
         code -> defaultReplaceWith code
 
   config <-
-    ifM (liftIO $ doesFileExist configPath)
+    ifM
+      (liftIO $ doesFileExist configPath)
       readConfig
-      (writeConfig (def @Config))
+      (writeConfig def)
 
   when (isNothing config.maxThreads) $
     updateConfig #maxThreads $ Just 1000

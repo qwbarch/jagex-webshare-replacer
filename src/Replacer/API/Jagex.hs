@@ -7,6 +7,7 @@ import Network.HTTP.Types (Status(..))
 import Network.HTTP.Client 
 import UnliftIO
 import Network.Connection
+import Control.Monad.Reader.Class
 
 isJagexBlocked proxy = handleError =<< try sendRequest
   where
@@ -16,7 +17,7 @@ isJagexBlocked proxy = handleError =<< try sendRequest
     handleError = \case
       Left exception@(VanillaHttpException (HttpExceptionRequest _ (InternalException internalException))) ->
         case fromException @HostCannotConnect internalException of
-          Just _ -> pure False -- Proxy doesn't work, do nothing and wait for it to come back up.
+          Just _ -> asks (.config.replaceProxyIfNotConnected)
           Nothing -> throwIO exception
       Left exception -> throwIO exception
       Right result -> pure result

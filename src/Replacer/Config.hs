@@ -9,7 +9,6 @@ import Control.Applicative
 import Data.Aeson
 import Data.Aeson.TH
 import Data.Aeson.Encode.Pretty (encodePretty)
-import Data.Aeson.QQ.Simple
 import Data.Text (Text)
 import Data.Typeable
 import Data.Functor
@@ -19,6 +18,7 @@ import System.Console.Haskeline
 import Replacer.Console
 import Text.Read
 import UnliftIO.Exception
+import Data.Char (toLower)
 
 configPath = "config.json"
 
@@ -27,20 +27,12 @@ data Config = Config
   , datacenterPlanId :: Maybe Int
   , staticPlanId :: Maybe Int
   , maxThreads :: Int
+  , replaceProxyIfNotConnected :: Bool
   , replaceWith :: Value
   , waitSecondsAfterReplacement :: Int
   }
 
 deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''Config
-
-defaultConfig = Config
-  { apiKey = "YOUR_API_KEY_HERE"
-  , datacenterPlanId = Nothing
-  , staticPlanId = Nothing
-  , maxThreads = 1000
-  , replaceWith = [aesonQQ|[{"type": "country", "country_code": "US"}]|]
-  , waitSecondsAfterReplacement = 15
-  }
 
 data ConfigError = ConfigError String
   deriving (Show, Typeable)
@@ -64,7 +56,7 @@ loadConfig = runInputT defaultSettings $ do
 
 promptConfig = do
   let promptApiKey =
-        Text.pack . fold <$> getPassword (Just '*') "Enter Webshare API key: " >>= \case
+        Text.pack . fold <$> getPassword (Just '*') "Webshare API key: " >>= \case
           "" -> promptApiKey
           key -> pure key
       promptPlanId message = runMaybeT $ do
@@ -72,16 +64,26 @@ promptConfig = do
           if null input
             then empty
             else maybe (MaybeT $ promptPlanId message) pure $ readMaybe input
+      promptYesNo message = do
+          fmap toLower . fold <$> getInputLine message >>= \case
+            "y" -> pure True
+            "yes" -> pure True
+            "" -> pure False
+            "n" -> pure False
+            "no" -> pure False
+            _ -> promptYesNo message
   apiKey <- promptApiKey
-  staticPlanId <- promptPlanId "Enter static residential plan id (leave empty if none): "
-  datacenterPlanId <- promptPlanId "Enter proxy server plan id (leave empty if none): "
-  countryCode <- fold <$> getInputLine "Enter replacement country code (default: US): "
+  staticPlanId <- promptPlanId "Static residential plan id (leave empty to skip): "
+  datacenterPlanId <- promptPlanId "Proxy server plan id (leave empty to skip): "
+  countryCode <- fold <$> getInputLine "Replacement country code [US]: "
+  replaceProxyIfNotConnected <- promptYesNo "Replace proxy if connection fails? [y/N]: "
   info mempty
   pure @(InputT IO) Config
     { apiKey = apiKey
     , datacenterPlanId = datacenterPlanId
     , staticPlanId = staticPlanId
     , maxThreads = 1000
+    , replaceProxyIfNotConnected = replaceProxyIfNotConnected
     , replaceWith = 
         toJSON
           [ object

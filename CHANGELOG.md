@@ -18,3 +18,8 @@ and this project adheres to the
 
 - Changed configuration to be more user-friendly by prompting for inputs instead.
 - **Warning:** If you have run a previous version, you will need to delete ``config.json`` and redo your settings.
+
+## 0.2.0.1 - 2026-02-20
+
+- Fixed a bug that caused the config to generate with no replacement country code.
+- Added option to replace proxy if it fails to connect (default: false).

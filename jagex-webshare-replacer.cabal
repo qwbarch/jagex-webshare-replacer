@@ -58,6 +58,7 @@ library
     , base >=4.7 && <5
     , base64-bytestring
     , bytestring
+    , crypton-connection
     , directory
     , extra
     , hashable
@@ -117,6 +118,7 @@ executable jagex-webshare-replacer
     , base >=4.7 && <5
     , base64-bytestring
     , bytestring
+    , crypton-connection
     , directory
     , extra
     , hashable

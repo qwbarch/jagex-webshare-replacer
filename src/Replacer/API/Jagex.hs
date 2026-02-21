@@ -4,12 +4,22 @@ import qualified Data.ByteString as ByteString
 import Network.HTTP.Req
 import Replacer.Request
 import Network.HTTP.Types (Status(..))
-import Network.HTTP.Client (Response(..), responseStatus, HttpExceptionContent (StatusCodeException))
+import Network.HTTP.Client 
+import UnliftIO
+import Network.Connection
 
-isJagexBlocked proxy =
-  ByteString.isInfixOf "Sorry, you have been blocked"
-    <$> requestWithProxy' modifyConfig proxy NoReqBody headers bsResponse GET url
+isJagexBlocked proxy = handleError =<< try sendRequest
   where
+    sendRequest = 
+      ByteString.isInfixOf "Sorry, you have been blocked"
+        <$> requestWithProxy' modifyConfig proxy NoReqBody headers bsResponse GET url
+    handleError = \case
+      Left exception@(VanillaHttpException (HttpExceptionRequest _ (InternalException internalException))) ->
+        case fromException @HostCannotConnect internalException of
+          Just _ -> pure False -- Proxy doesn't work, do nothing and wait for it to come back up.
+          Nothing -> throwIO exception
+      Left exception -> throwIO exception
+      Right result -> pure result
     modifyConfig config =
         config 
           { httpConfigCheckResponse = \_ response _ ->

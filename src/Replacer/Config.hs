@@ -12,7 +12,6 @@ import Data.Aeson.Encode.Pretty (encodePretty)
 import Data.Aeson.QQ.Simple
 import Data.Text (Text)
 import Data.Typeable
-import Data.Maybe
 import Data.Functor
 import Data.Foldable
 import System.Directory
@@ -76,10 +75,8 @@ promptConfig = do
   apiKey <- promptApiKey
   staticPlanId <- promptPlanId "Enter static residential plan id (leave empty if none): "
   datacenterPlanId <- promptPlanId "Enter proxy server plan id (leave empty if none): "
-  countryCode <-
-    getInputLine "Enter replacement country code (default: US): "
-      <&> fromMaybe "US"
-  info "\n"
+  countryCode <- fold <$> getInputLine "Enter replacement country code (default: US): "
+  info mempty
   pure @(InputT IO) Config
     { apiKey = apiKey
     , datacenterPlanId = datacenterPlanId
@@ -89,7 +86,7 @@ promptConfig = do
         toJSON
           [ object
               [ "type" .= ("country" :: Text)
-              , "country_code" .= countryCode
+              , "country_code" .= (if null countryCode then "US" else countryCode)
               ]
           ]
     , waitSecondsAfterReplacement = 15

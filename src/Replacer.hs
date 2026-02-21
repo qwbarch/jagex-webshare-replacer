@@ -73,17 +73,13 @@ replaceBlockedWebshareProxies = run
             threadDelay 1_000_000
             tickProgress progressBar
         
-        info "\n"
+        info mempty
         replaceBlockedProxies (checkedProxies <> unblockedProxies) planName planId
       
     waitUntilReplacementFinished planId replacementId = do
       replacement <- getReplacement planId replacementId
-      let onFinish = do
-            let proxiesReplaced = fromMaybe 0 replacement.proxiesAdded
-            if proxiesReplaced == 0
-              then pure ()
-              else
-                info [i|\nReplaced #{highlight Cyan $ proxiesAdded replacement} proxies.|]
+      let proxiesReplaced = fromMaybe 0 replacement.proxiesAdded
+          onFinish = info [i|\nReplaced #{highlight Cyan proxiesReplaced} proxies.|]
           wait = threadDelay 200_000
       case replacement.state of
         "completed" -> onFinish

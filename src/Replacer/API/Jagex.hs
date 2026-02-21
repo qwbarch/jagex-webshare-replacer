@@ -1,13 +1,14 @@
 module Replacer.API.Jagex where
 
 import qualified Data.ByteString as ByteString
+import Control.Monad.Reader.Class
 import Network.HTTP.Req
-import Replacer.Request
 import Network.HTTP.Types (Status(..))
 import Network.HTTP.Client 
-import UnliftIO
 import Network.Connection
-import Control.Monad.Reader.Class
+import Replacer.Request
+import Replacer.Env
+import UnliftIO
 
 isJagexBlocked proxy = handleError =<< try sendRequest
   where
@@ -17,7 +18,7 @@ isJagexBlocked proxy = handleError =<< try sendRequest
     handleError = \case
       Left exception@(VanillaHttpException (HttpExceptionRequest _ (InternalException internalException))) ->
         case fromException @HostCannotConnect internalException of
-          Just _ -> asks (.config.replaceProxyIfNotConnected)
+          Just _ -> asks replaceProxyIfNotConnected
           Nothing -> throwIO exception
       Left exception -> throwIO exception
       Right result -> pure result

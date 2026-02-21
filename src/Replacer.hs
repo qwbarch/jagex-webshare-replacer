@@ -11,7 +11,6 @@ import Data.Foldable.Extra
 import Data.Text
 import Data.String.Interpolate
 import Replacer.Console
-import Replacer.Config
 import Replacer.Worker
 import Replacer.Env
 import Replacer.API.Jagex
@@ -30,13 +29,13 @@ replaceBlockedWebshareProxies :: (HasCallStack, MonadReader Env m) => MonadUnlif
 replaceBlockedWebshareProxies = run
   where
     run = do
-      config <- asks (.config)
-      traverse_ (replaceBlockedProxies mempty "Proxy Server") config.datacenterPlanId 
-      traverse_ (replaceBlockedProxies mempty "Static residential") config.staticPlanId
+      env <- ask
+      traverse_ (replaceBlockedProxies mempty "Proxy Server") env.datacenterPlanId 
+      traverse_ (replaceBlockedProxies mempty "Static residential") env.staticPlanId
       info $ color Green "Finished replacing all blocked proxies."
 
     replaceBlockedProxies checkedProxies (planName :: Text) planId = do
-      config <- asks (.config)
+      env <- ask
 
       info [i|Fetching proxies for #{color Yellow planName} plan.|]
       proxies <- getProxies planId
@@ -68,8 +67,8 @@ replaceBlockedWebshareProxies = run
         withProgressBar_ "Attempting to replace blocked proxies" $
           waitUntilReplacementFinished planId =<< createReplacement planId blockedProxies
         
-        withProgressBar "Waiting to start next attempt" config.waitSecondsAfterReplacement $ \progressBar ->
-          for_ [1 .. config.waitSecondsAfterReplacement] . const $ do
+        withProgressBar "Waiting to start next attempt" env.waitSecondsAfterReplacement $ \progressBar ->
+          for_ [1 .. env.waitSecondsAfterReplacement] . const $ do
             threadDelay 1_000_000
             tickProgress progressBar
         

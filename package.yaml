@@ -27,6 +27,8 @@ dependencies:
 - unordered-containers
 - haskeline
 - crypton-connection
+- data-default
+- optics
 
 ghc-options:
   -Wall

@@ -11,12 +11,11 @@ import Replacer.Console
 import UnliftIO
 import System.Console.Haskeline 
 
-main = do
-  let retryPolicy = fullJitterBackoff 1 <> limitRetries 10
-      onError = info . color Red . Text.pack . displayException
-      runMain = do
-        config <- loadConfig
-        runReaderT replaceBlockedWebshareProxies (Env config retryPolicy)
-  handle @_ @SomeException onError runMain
-  info "\nPress any key to exit..."
-  void . runInputT defaultSettings $ waitForAnyKey mempty
+main = handle @_ @SomeException onError runMain >> waitToExit
+  where
+    retryPolicy = fullJitterBackoff 1 <> limitRetries 10
+    onError = info . color Red . Text.pack . displayException
+    runMain = runReaderT replaceBlockedWebshareProxies . fromConfig retryPolicy =<< loadConfig
+    waitToExit = do
+      info "\nPress any key to exit..."
+      void . runInputT defaultSettings $ waitForAnyKey mempty

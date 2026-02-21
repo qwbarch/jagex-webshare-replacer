@@ -19,18 +19,22 @@ import Replacer.Console
 import Text.Read
 import UnliftIO.Exception
 import Data.Char (toLower)
+import Data.Default
+import GHC.Generics
+import Data.Maybe
+import Optics
 
 configPath = "config.json"
 
 data Config = Config
-  { apiKey :: Text
+  { apiKey :: Maybe Text
   , datacenterPlanId :: Maybe Int
   , staticPlanId :: Maybe Int
-  , maxThreads :: Int
-  , replaceProxyIfNotConnected :: Bool
-  , replaceWith :: Value
-  , waitSecondsAfterReplacement :: Int
-  }
+  , maxThreads :: Maybe Int
+  , replaceProxyIfNotConnected :: Maybe Bool
+  , replaceWith :: Maybe Value
+  , waitSecondsAfterReplacement :: Maybe Int
+  } deriving (Generic, Default)
 
 deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''Config
 
@@ -39,23 +43,20 @@ data ConfigError = ConfigError String
 
 instance Exception ConfigError
 
--- | Loads the json config and creates the file with default values if missing.
-loadConfig = runInputT defaultSettings $ do
-  ifM (liftIO $ doesFileExist configPath)
-    (readConfig)
-    (writeConfig =<< promptConfig)
-  where
-    writeConfig config =
-      liftIO 
-        $ ByteString.writeFile configPath (encodePretty config)
-        $> config
-    readConfig =
-      liftIO
-        $ ByteString.readFile configPath
-        >>= either (throwIO . ConfigError) pure . eitherDecode @Config
-
-promptConfig = do
-  let promptApiKey =
+loadConfig = runInputT @IO defaultSettings $ do
+  let writeConfig config =
+        liftIO
+          $ ByteString.writeFile configPath (encodePretty config)
+          $> config
+      readConfig =
+        liftIO
+          $ ByteString.readFile configPath
+          >>= either (throwIO . ConfigError) pure . eitherDecode @Config
+      updateConfig field value = do
+          config <- readConfig
+          _ <- writeConfig $ config & field .~ value
+          pure ()
+      promptApiKey =
         Text.pack . fold <$> getPassword (Just '*') "Webshare API key: " >>= \case
           "" -> promptApiKey
           key -> pure key
@@ -72,24 +73,46 @@ promptConfig = do
             "n" -> pure False
             "no" -> pure False
             _ -> promptYesNo message
-  apiKey <- promptApiKey
-  staticPlanId <- promptPlanId "Static residential plan id (leave empty to skip): "
-  datacenterPlanId <- promptPlanId "Proxy server plan id (leave empty to skip): "
-  countryCode <- fold <$> getInputLine "Replacement country code [US]: "
-  replaceProxyIfNotConnected <- promptYesNo "Replace proxy if connection fails? [y/N]: "
+      promptProxyPlan = do
+        config <- readConfig
+        when (isNothing config.staticPlanId && isNothing config.datacenterPlanId) $ do
+          updateConfig #staticPlanId =<< promptPlanId "Static residential plan id (leave empty to skip): "
+          updateConfig #datacenterPlanId =<< promptPlanId "Proxy server plan id (leave empty to skip): "
+          promptProxyPlan
+      defaultReplaceWith :: String -> Maybe Value
+      defaultReplaceWith countryCode =
+        Just $
+          toJSON
+            [ object
+                [ "type" .= ("country" :: Text)
+                , "country_code" .= (if null countryCode then "US" else countryCode)
+                ]
+            ]
+      parseCountryCode = \case
+        "" -> defaultReplaceWith "US"
+        code -> defaultReplaceWith code
+
+  config <-
+    ifM (liftIO $ doesFileExist configPath)
+      readConfig
+      (writeConfig (def @Config))
+
+  when (isNothing config.maxThreads) $
+    updateConfig #maxThreads $ Just 1000
+
+  when (isNothing config.waitSecondsAfterReplacement) $
+    updateConfig #waitSecondsAfterReplacement $ Just 15
+  
+  when (isNothing config.apiKey) $ do
+    updateConfig #apiKey . Just =<< promptApiKey
+
+  promptProxyPlan
+
+  when (isNothing config.replaceWith) $
+    updateConfig #replaceWith . parseCountryCode . fold =<< getInputLine "Replacement country code [US]: "
+
+  when (isNothing config.replaceProxyIfNotConnected) $
+    updateConfig #replaceProxyIfNotConnected . Just =<< promptYesNo "Replace proxy if connection fails? [y/N]: "
+      
   info mempty
-  pure @(InputT IO) Config
-    { apiKey = apiKey
-    , datacenterPlanId = datacenterPlanId
-    , staticPlanId = staticPlanId
-    , maxThreads = 1000
-    , replaceProxyIfNotConnected = replaceProxyIfNotConnected
-    , replaceWith = 
-        toJSON
-          [ object
-              [ "type" .= ("country" :: Text)
-              , "country_code" .= (if null countryCode then "US" else countryCode)
-              ]
-          ]
-    , waitSecondsAfterReplacement = 15
-    }
+  readConfig

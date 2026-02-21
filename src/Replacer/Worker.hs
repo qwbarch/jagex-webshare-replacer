@@ -18,5 +18,5 @@ runWorkers runParam params = \case
   where
     pooledMap run = do
         env <- ask
-        results <- pooledMapConcurrentlyN env.config.maxThreads run params
+        results <- pooledMapConcurrentlyN env.maxThreads run params
         pure $ Vector.zip params results

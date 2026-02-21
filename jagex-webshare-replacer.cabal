@@ -59,6 +59,7 @@ library
     , base64-bytestring
     , bytestring
     , crypton-connection
+    , data-default
     , directory
     , extra
     , hashable
@@ -67,6 +68,7 @@ library
     , http-client-tls
     , http-types
     , mtl
+    , optics
     , pretty-terminal
     , regex-tdfa
     , req
@@ -119,6 +121,7 @@ executable jagex-webshare-replacer
     , base64-bytestring
     , bytestring
     , crypton-connection
+    , data-default
     , directory
     , extra
     , hashable
@@ -128,6 +131,7 @@ executable jagex-webshare-replacer
     , http-types
     , jagex-webshare-replacer
     , mtl
+    , optics
     , pretty-terminal
     , regex-tdfa
     , req

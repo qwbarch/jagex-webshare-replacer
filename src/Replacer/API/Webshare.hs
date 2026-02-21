@@ -11,7 +11,6 @@ import Data.Maybe
 import Data.Text.Encoding
 import Network.HTTP.Req
 import Replacer.Env
-import Replacer.Config
 import Replacer.Request
 import Replacer.Proxy
 import qualified Data.HashSet as HashSet
@@ -58,7 +57,7 @@ deriveJSON (defaultOptions { fieldLabelModifier = camelTo2 '_' }) ''GetPlanDetai
 
 requestWebshare body scheme response method url = do
   env <- ask
-  let tokenHeader = header "Authorization" [i|Token #{apiKey $ config env}|]
+  let tokenHeader = header "Authorization" [i|Token #{apiKey env}|]
   request body (scheme <> tokenHeader) response method url
 
 getDownloadToken planId =
@@ -100,7 +99,7 @@ createReplacement planId proxies = do
               [ "type" .= ("ip_address" :: String)
               , "ip_addresses" .= (HashSet.map (decodeUtf8 . host) proxies)
               ]
-          , "replace_with" .= env.config.replaceWith
+          , "replace_with" .= env.replaceWith
           , "dry_run" .= False
           ]
   response :: CreateReplacementResponse <-

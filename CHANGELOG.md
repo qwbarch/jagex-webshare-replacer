@@ -23,3 +23,4 @@ and this project adheres to the
 
 - Fixed a bug that caused the config to generate with no replacement country code.
 - Added option to replace proxy if it fails to connect (default: false).
+- User options are now saved as they are entered.

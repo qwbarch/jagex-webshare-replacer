@@ -13,3 +13,8 @@ and this project adheres to the
 ## 0.1.0.1 - 2026-02-19
 
 - Fixed active proxy count on repeated runs.
+
+## 0.2.0.0 - 2026-02-20
+
+- Changed configuration to be more user-friendly by prompting for inputs instead.
+- **Warning:** If you have run a previous version, you will need to delete ``config.json`` and redo your settings.

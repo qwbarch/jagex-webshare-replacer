@@ -1,5 +1,5 @@
 name: jagex-webshare-replacer
-version: 0.1.0.2
+version: 0.2.0.0
 
 dependencies:
 - base >= 4.7 && < 5
@@ -13,7 +13,6 @@ dependencies:
 - http-types
 - aeson
 - aeson-pretty
-- aeson-qq
 - mtl
 - transformers
 - pretty-terminal
@@ -26,6 +25,7 @@ dependencies:
 - retry
 - hashable
 - unordered-containers
+- haskeline
 
 ghc-options:
   -Wall

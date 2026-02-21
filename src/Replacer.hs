@@ -27,24 +27,21 @@ data ReplaceError = ReplaceError Text
 instance Exception ReplaceError
 
 replaceBlockedWebshareProxies :: (HasCallStack, MonadReader Env m) => MonadUnliftIO m => MonadIO m => m ()
-replaceBlockedWebshareProxies =
-  fetchPlanIds
-    >>= traverse_ (replaceBlockedProxies mempty)
-    >> info (color Green "Finished replacing all blocked proxies.")
+replaceBlockedWebshareProxies = run
   where
-    fetchPlanIds = do
-      planIds <- asks (.config.planIds)
-      let planCount = Vector.length planIds
-      info [i|Loaded #{planCount} proxy plan#{pluralPostfix planCount}: #{planIds}\n|]
-      return planIds
+    run = do
+      config <- asks (.config)
+      traverse_ (replaceBlockedProxies mempty "Proxy Server") config.datacenterPlanId 
+      traverse_ (replaceBlockedProxies mempty "Static residential") config.staticPlanId
+      info $ color Green "Finished replacing all blocked proxies."
 
-    replaceBlockedProxies checkedProxies planId = do
+    replaceBlockedProxies checkedProxies (planName :: Text) planId = do
       config <- asks (.config)
 
-      info [i|Fetching proxy list for plan #{highlight Yellow planId}|]
+      info [i|Fetching proxies for #{color Yellow planName} plan.|]
       proxies <- getProxies planId
       let proxyCount = HashSet.size proxies
-      info [i|Found #{highlight Cyan proxyCount} #{pluralProxy proxyCount} in plan #{highlight Yellow planId}|]
+      info [i|Found #{highlight Cyan proxyCount} #{pluralProxy proxyCount} for #{color Yellow planName} plan.|]
 
       let uncheckedProxies = Vector.fromList . toList $ HashSet.difference proxies checkedProxies
           uncheckedCount = Vector.length uncheckedProxies
@@ -65,7 +62,7 @@ replaceBlockedWebshareProxies =
 
       planDetails <- getPlanDetails planId
       let replacementsAvailable = proxyReplacementsAvailable planDetails
-      info [i|Plan #{planId} has #{highlight Yellow replacementsAvailable} replacements remaining.\n|]
+      info [i|#{planName} has #{highlight Yellow replacementsAvailable} replacements remaining.\n|]
 
       when (blockedCount > 0 && replacementsAvailable > 0) $ do
         withProgressBar_ "Attempting to replace blocked proxies" $
@@ -77,7 +74,7 @@ replaceBlockedWebshareProxies =
             tickProgress progressBar
         
         info "\n"
-        replaceBlockedProxies (checkedProxies <> unblockedProxies) planId
+        replaceBlockedProxies (checkedProxies <> unblockedProxies) planName planId
       
     waitUntilReplacementFinished planId replacementId = do
       replacement <- getReplacement planId replacementId

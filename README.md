@@ -7,14 +7,16 @@ A simple script that checks and replaces your webshare proxies if they are block
 ## How to use
 
 1. Download the latest version from the [release](https://github.com/qwbarch/jagex-webshare-replacer/releases) tab.
-2. Run the executable file to generate the configuration file.
-3. Modify ``config.json`` and set your ``api_key`` and ``plan_ids``. See [below](#configuration) for more details.
-4. Run the executable file.
+2. Run ``jagex-webshare-replacer.exe``.
+3. Create a [Webshare API key](https://dashboard.webshare.io/userapi/keys) and paste it when prompted.
+4. If replacing ``Proxy Server`` proxies, find its [plan id](#finding-plan-ids) and paste it when prompted. Leave blank to skip this plan.
+5. If replacing ``Static Residential`` proxies, find its [plan id](#finding-plan-ids) and paste it when prompted. Leave blank to skip this plan.
+6. Enter the [country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for your replacement proxies. Leave blank to default to ``US``.
 
 ## Configuration
 
 > [!WARNING]
-> This program will not run if ``api_key`` and ``plan_ids`` is missing.
+> This is for advanced users only. Below are the available options to configure your ``config.json`` (generated after first run).
 
 | Name                           | Type     | Default | Description                                                                                                                              |
 |--------------------------------|----------|---------|------------------------------------------------------------------------------------------------------------------------------------------|

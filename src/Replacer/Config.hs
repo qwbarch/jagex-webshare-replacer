@@ -5,7 +5,6 @@ import qualified Data.ByteString.Lazy as ByteString
 import Control.Monad.Extra
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Maybe
-import Control.Applicative
 import Data.Aeson
 import Data.Aeson.TH
 import Data.Aeson.Encode.Pretty (encodePretty)
@@ -62,14 +61,13 @@ loadConfig = runInputT @IO defaultSettings $ do
           key -> pure key
       promptPlanId message = runMaybeT $ do
           input <- MaybeT $ getInputLine message
-          if null input
-            then empty
-            else maybe (MaybeT $ promptPlanId message) pure $ readMaybe input
-      promptYesNo message = do
+          guard . not $ null input
+          maybe (MaybeT $ promptPlanId message) pure $ readMaybe input
+      promptYesNo message =
           fmap toLower . fold <$> getInputLine message >>= \case
             "y" -> pure True
             "yes" -> pure True
-            "" -> pure False
+            "" -> pure False -- Default value.
             "n" -> pure False
             "no" -> pure False
             _ -> promptYesNo message
@@ -108,8 +106,19 @@ loadConfig = runInputT @IO defaultSettings $ do
 
   promptProxyPlan
 
-  when (isNothing config.replaceWith) $
-    updateConfig #replaceWith . parseCountryCode . fold =<< getInputLine "Replacement country code [US]: "
+  when (isNothing config.replaceWith) $ do
+    useRandomCountry <- promptYesNo "Replace proxy with a random country's? [y/N]"
+    if useRandomCountry
+      then
+        updateConfig
+          #replaceWith
+          . Just
+          $ object ["type" .= ("any" :: Text)]
+      else 
+        updateConfig #replaceWith
+          . parseCountryCode
+          . fold
+          =<< getInputLine "Replacement country code [US]: "
 
   when (isNothing config.replaceProxyIfNotConnected) $
     updateConfig #replaceProxyIfNotConnected . Just =<< promptYesNo "Replace proxy if connection fails? [y/N]: "

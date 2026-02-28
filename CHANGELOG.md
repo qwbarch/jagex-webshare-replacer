@@ -24,3 +24,8 @@ and this project adheres to the
 - Fixed a bug that caused the config to generate with no replacement country code.
 - Added option to replace proxy if it fails to connect (default: false).
 - User options are now saved as they are entered.
+
+## 0.3.0.1 - 2026-02-28
+
+- Added option to replace proxy with a random country's. Note: This is untested since it's a requested
+  feature that I don't want to use my proxy replacements on to test.
